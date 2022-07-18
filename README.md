@@ -7,7 +7,8 @@ https://libgdx.com/wiki/start/a-simple-game
 https://libgdx.com/wiki/start/simple-game-extended
 
 ## Topics
-Textures, sound, music, camera, spriteBatch, recatangles, vector3, mouse drag, keyboard input
+Textures, sound, music, camera, spriteBatch, recatangles, vector3, mouse drag, keyboard input,
+Multiple screens: main screen and ingame screen, point counter
 
 ## Main Screen
 ![Main Screen](https://github.com/xyzcv979/libGDX-WaterDrop-Game/blob/main/pictures/main%20screen.png)
