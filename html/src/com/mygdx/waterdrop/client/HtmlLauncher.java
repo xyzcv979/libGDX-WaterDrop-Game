@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.mygdx.waterdrop.WaterDrop;
+import com.mygdx.waterdrop.WaterDropGame;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -17,6 +18,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new WaterDrop();
+                return new WaterDropGame();
         }
 }

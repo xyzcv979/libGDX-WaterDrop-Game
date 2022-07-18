@@ -3,6 +3,7 @@ package com.mygdx.waterdrop;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,30 +19,24 @@ import org.w3c.dom.css.Rect;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class WaterDrop extends ApplicationAdapter {
+public class WaterDrop implements Screen {
+
+	final WaterDropGame game;
 	private Texture waterDrop;
 	private Texture bucketImage;
 	private Sound dropSound;
 	private Music rainMusic;
 	private OrthographicCamera camera;
-	private SpriteBatch batch; // used to draw 2D images
 	private Rectangle bucket;
 	private Vector3 touchPos; // for mouse click position
 	private Array<Rectangle> rainDrops; // libGDX class used to minimize garbage
 	private long lastDropTime; // tracks last time rain drop was spawned. Stored in nanoseconds
+	private int dropsCollected;
 
-	private void spawnRainDrop() {
-		Rectangle rainDrop = new Rectangle();
-		rainDrop.x = MathUtils.random(0, 800-64);
-		rainDrop.y = 480;
-		rainDrop.width = 64;
-		rainDrop.height = 64;
-		rainDrops.add(rainDrop);
-		lastDropTime = TimeUtils.nanoTime();
-	}
+	public WaterDrop(final WaterDropGame game) {
+		this.game = game;
+		this.game.setGameScreen(this);
 
-	@Override
-	public void create () {
 		waterDrop = new Texture("rainDrop.png");
 		bucketImage = new Texture("bucket.png");
 
@@ -50,9 +45,6 @@ public class WaterDrop extends ApplicationAdapter {
 		// Music for >10 secs. Too big to be stored in memory completely
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("falling_rain.mp3"));
 		rainMusic.setLooping(true);
-		rainMusic.play();
-
-		batch = new SpriteBatch();
 
 		camera = new OrthographicCamera();
 		//Camera always shows window of this size
@@ -69,25 +61,38 @@ public class WaterDrop extends ApplicationAdapter {
 		rainDrops = new Array<Rectangle>();
 		spawnRainDrop();
 
+		dropsCollected = 0;
+
+	}
+
+	private void spawnRainDrop() {
+		Rectangle rainDrop = new Rectangle();
+		rainDrop.x = MathUtils.random(0, 800-64);
+		rainDrop.y = 480;
+		rainDrop.width = 64;
+		rainDrop.height = 64;
+		rainDrops.add(rainDrop);
+		lastDropTime = TimeUtils.nanoTime();
 	}
 
 	@Override
-	public void render () {
+	public void render(float delta) {
 		// red blue green alpha within range [0,1]
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 
 		camera.update();
 
 		// use coordinates set by camera
-		batch.setProjectionMatrix(camera.combined);
+		game.batch.setProjectionMatrix(camera.combined);
 		// SpiritBatch records all drawing commands
 		// between begin() and end(). Speeds up rendering
-		batch.begin();
-		batch.draw(bucketImage, bucket.x, bucket.y);
+		game.batch.begin();
+		game.batch.draw(bucketImage, bucket.x, bucket.y);
 		for(Rectangle rainDrop : rainDrops) {
-			batch.draw(waterDrop, rainDrop.x, rainDrop.y);
+			game.batch.draw(waterDrop, rainDrop.x, rainDrop.y);
 		}
-		batch.end();
+		game.font.draw(game.batch, "Drops Collected: " + dropsCollected, 10, 460);
+		game.batch.end();
 
 		//Moving bucket with mouse
 		if(Gdx.input.isTouched()) {
@@ -130,9 +135,24 @@ public class WaterDrop extends ApplicationAdapter {
 			if(rainDrop.intersects(bucket)) {
 				dropSound.play();
 				rainDrops.removeIndex(i);
+				dropsCollected++;
 			}
 		}
 
+	}
+	@Override
+	public void resize(int width, int height) {
+	}
+	@Override
+	public void hide() {
+	}
+
+	@Override
+	public void pause() {
+	}
+
+	@Override
+	public void resume() {
 	}
 
 	// Manually disposing, helping OS
@@ -142,7 +162,11 @@ public class WaterDrop extends ApplicationAdapter {
 		bucketImage.dispose();
 		dropSound.dispose();
 		waterDrop.dispose();
-		batch.dispose();
+	}
 
+	@Override
+	public void show() {
+		// Starts background music when screen is shown
+		rainMusic.play();
 	}
 }

@@ -12,6 +12,6 @@ public class DesktopLauncher {
 		config.setTitle("waterdrop");
 		config.setWindowedMode(800, 480);
 		config.useVsync(true);
-		new Lwjgl3Application(new WaterDrop(), config);
+		new Lwjgl3Application(new WaterDropGame(), config);
 	}
 }
